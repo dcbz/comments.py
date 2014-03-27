@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import re
 import os
 import lldb
 import shlex
@@ -62,6 +63,7 @@ def add_comment(debugger,command,result,dict):
         offset = addobj.GetOffset()
         #print dir(addobj)
 	sectionname = addobj.GetSection().__str__().split(" ")[1]
+	sectionname = re.sub("[.]__[A-Z0-9]+[.]__",".__",sectionname) # hack for ida -> osx compat
         insts =  addobj.GetSymbol().GetInstructions(target)
 	c = globals()['DATABASE'].cursor()
 	c.execute("INSERT INTO comments VALUES ('%s',%u, '%s')" % (sectionname,offset,args[1]))
@@ -115,6 +117,7 @@ def cdis(debugger, command, result, dict):
 		offset = instaddr.GetOffset()
 		#print dir(addobj)
 		sectionname = instaddr.GetSection().__str__().split(" ")[1]
+		sectionname = re.sub("[.]__[A-Z0-9]+[.]__",".__",sectionname) # hack for ida -> osx compat
 		#print "looking up: %s:%u" % (sectionname,offset)
 
 		c.execute("SELECT comment FROM comments WHERE sectionname='%s' AND offset=%u" % (sectionname,offset)) 
