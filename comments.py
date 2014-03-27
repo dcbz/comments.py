@@ -77,18 +77,21 @@ def cdis(debugger, command, result, dict):
 	
 	lldb.debugger.SetAsync (False)
 	
-	variable = frame.FindVariable(args[0])
-	if variable.IsValid():
-		address = variable.GetValueAsSigned()
-	else:
-		try:
-			address = int(args[0], 0)
-		except:
-			print "The argument is not a valid address or variable in the frame"
-			return
-	
-	addobj = target.ResolveLoadAddress(address) 
-	if(len(args) == 1):
+	if(len(args) > 0) :
+		variable = frame.FindVariable(args[0])
+		if variable.IsValid():
+			address = variable.GetValueAsSigned()
+		else:
+			try:
+				address = int(args[0], 0)
+			except:
+				print "The argument is not a valid address or variable in the frame"
+				return
+		addobj = target.ResolveLoadAddress(address) 
+
+	if(len(args) == 0):
+		insts = target.ReadInstructions(target.ResolveLoadAddress(frame.pc),5);
+	elif(len(args) == 1):
 		insts =  addobj.GetSymbol().GetInstructions(target)
 	elif(len(args) == 2):
 		insts = target.ReadInstructions(addobj,int(args[1],0));
