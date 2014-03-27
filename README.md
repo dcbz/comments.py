@@ -1,6 +1,7 @@
 comments.py
 ===========
 
+<pre>
 Comments.py plugin for lldb to display disassembly with user defined comments.
 
 (lldb) command script import ~/comments.py/comments.py
@@ -34,4 +35,4 @@ Comments.py plugin for lldb to display disassembly with user defined comments.
 (lldb) save_comment_db ~/awesomecomments.db
 (lldb) load_comment_db ~/awesomecomments.db
 (lldb) 
-
+</pre>
