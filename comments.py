@@ -87,9 +87,15 @@ def cdis(debugger, command, result, dict):
 			print "The argument is not a valid address or variable in the frame"
 			return
 	
-	#if(len(args) == 1):
 	addobj = target.ResolveLoadAddress(address) 
-	insts =  addobj.GetSymbol().GetInstructions(target)
+	if(len(args) == 1):
+		insts =  addobj.GetSymbol().GetInstructions(target)
+	elif(len(args) == 2):
+		insts = target.ReadInstructions(addobj,int(args[1],0));
+	else:
+		print "usage: cdis <address> [number of instructions]"
+		return
+
 	
 
 	c = globals()['DATABASE'].cursor()
