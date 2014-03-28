@@ -40,7 +40,7 @@ while ea != BADADDR and ea <= idaapi.cvar.inf.maxEA:
 			offset = ea - seg.startEA
 			name = modulename + "." + idc.SegName(seg.startEA)	
 			print "[+] Inserting %s + %u: %s" % (name,offset,comment)
-			c.execute("INSERT INTO comments VALUES ('%s',%u, '%s')" % (name,offset,comment))
+			c.execute("INSERT INTO comments VALUES (?,?,? )",(name,offset,comment))
 			dbconn.commit()
 			
 	ea = idaapi.next_head(ea, idaapi.cvar.inf.maxEA)
