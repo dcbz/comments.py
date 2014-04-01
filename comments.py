@@ -8,8 +8,24 @@ import shlex
 import sqlite3
 import tempfile
 
-globals()['DATABASE'] = 0
+class bcolors:
+    HEADER = '\033[95m'
+    OKRED = "\033[.31m" 
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
 
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+globals()['DATABASE'] = 0
 
 
 #target stop-hook add --one-liner "frame variable argc argv"
@@ -108,11 +124,17 @@ def cdis(debugger, command, result, dict):
 
 	c = globals()['DATABASE'].cursor()
 	for inst in insts:
-		line = ("0x%016lx" % inst.GetAddress().GetLoadAddress(target)) + "\t" + inst.GetMnemonic(target) + "\t" + inst.GetOperands(target) + "\t"
+		operand = inst.GetOperands(target)
+	#	operand = re.sub("(0x[0-9a-zA-Z]+)", bcolors.HEADER + "\1" + bcolors.ENDC, operand)
+#		operand = re.sub("(%[a-z0-9]+)", bcolors.OKRED + "%s\1" + bcolors.ENDC, operand)
+		operand = re.sub("(0x[0-9a-zA-Z]+)", r'\033[95m\1\033[0m', operand)
+		operand = re.sub("(%[a-z0-9]+)", r'\033[.31m\1\033[0m', operand)
+		#bcolors.HEADER + inst.GetOperands(target) + bcolors.ENDC 	inst.GetOperands(target)
+		line = ("%s" % bcolors.WARNING) + ("0x%016lx" % inst.GetAddress().GetLoadAddress(target)) + "\t" + bcolors.ENDC + bcolors.OKGREEN + inst.GetMnemonic(target) + bcolors.ENDC + "\t" + operand + "\t"
 	 	instaddr = inst.GetAddress()
 		comment = inst.GetComment(target)
 		if(comment):
-			line += "// %s" % comment
+			line += (bcolors.OKBLUE + "// %s" + bcolors.ENDC) % comment
 
 		offset = instaddr.GetOffset()
 		#print dir(addobj)
@@ -125,7 +147,7 @@ def cdis(debugger, command, result, dict):
 		if(mycomment):
 			line += " //" + mycomment[0]
 
-		print line	
+		print line
 	lldb.debugger.SetAsync (True)
 	
 
