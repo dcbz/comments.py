@@ -28,7 +28,9 @@ class bcolors:
 globals()['DATABASE'] = 0
 
 
-#target stop-hook add --one-liner "frame variable argc argv"
+#settings set stop-disassembly-count 0
+#settings set stop-disassembly-display always
+#target stop-hook add --one-liner cdis
 #globals()["ARCH"] = 32
 def load_comment_db(debugger,command,result,dict):
 	args = shlex.split(command)
@@ -86,6 +88,7 @@ def add_comment(debugger,command,result,dict):
 	globals()['DATABASE'].commit()
 
 def cdis(debugger, command, result, dict):
+	print ""
 	args = shlex.split(command)
 	target = debugger.GetSelectedTarget()
 	process = target.GetProcess()
@@ -156,11 +159,13 @@ def __lldb_init_module (debugger, dict):
 	debugger.HandleCommand('command script add -f comments.add_comment add_comment')
 	debugger.HandleCommand('command script add -f comments.save_comment_db save_comment_db')
 	debugger.HandleCommand('command script add -f comments.load_comment_db load_comment_db')
+	print bcolors.WARNING
 	print "--------------------------------------"
 	print " Commented Disassembly lldb Module"
 	print " nemo 2014"
 	print "--------------------------------------"
 	print ""
+	print bcolors.ENDC
 	globals()["DATABASE"] = sqlite3.connect(':memory:')
 	c = globals()["DATABASE"].cursor()
 
