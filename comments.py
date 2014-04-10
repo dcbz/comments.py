@@ -26,12 +26,8 @@ class bcolors:
         self.ENDC = ''
 
 globals()['DATABASE'] = 0
+globals()["ARCH"] = 8
 
-
-#settings set stop-disassembly-count 0
-#settings set stop-disassembly-display always
-#target stop-hook add --one-liner cdis
-#globals()["ARCH"] = 32
 def load_comment_db(debugger,command,result,dict):
 	args = shlex.split(command)
 	if(len(args) != 1):
@@ -168,10 +164,15 @@ def __lldb_init_module (debugger, dict):
 	print bcolors.ENDC
 	globals()["DATABASE"] = sqlite3.connect(':memory:')
 	c = globals()["DATABASE"].cursor()
+	lldb.debugger.HandleCommand("settings set stop-disassembly-count 0")  # remove disassembly from stop
+	lldb.debugger.HandleCommand("target stop-hook add --one-liner cdis")  # add our own.
 
 	# Create table
 	c.execute('''CREATE TABLE comments
 		     (sectionname text, offset integer, comment text)''')
+
+	tgt =  lldb.debugger.GetSelectedTarget()
+	globals()["ARCH"] = tgt.GetAddressByteSize()
 
 	# Save (commit) the changes
 	globals()["DATABASE"].commit()
